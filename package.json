@@ -1,0 +1,7 @@
+{
+  "name": "recruit-ai",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  }
+}
