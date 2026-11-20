@@ -245,6 +245,7 @@ pre{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#dbe3ec;paddi
 .apply p{font-size:13.5px;color:var(--sub)}
 .apply input,.apply select{border:1px solid #cdd5de;border-radius:6px;padding:11px 12px;width:100%;font-size:14px}
 .apply .msg{display:none;font-size:13px;background:var(--main-soft);color:#1e4f9a;padding:12px;border-radius:6px}
+.apply .hp{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 @media(max-width:920px){.apply{grid-template-columns:1fr}}
 
 /* faq */
@@ -531,22 +532,24 @@ footer nav{display:flex;gap:18px}
         <span class="tg">企業の方</span>
         <h3>求人を掲載したい</h3>
         <p>担当者より、掲載の手順をご案内します。</p>
-        <input required placeholder="会社名">
-        <input required placeholder="ご担当者名">
-        <input required type="email" placeholder="メールアドレス">
-        <select><option>任せたい業務：調査</option><option>任せたい業務：経理</option><option>任せたい業務：営業</option><option>任せたい業務：マーケティング</option><option>任せたい業務：その他</option></select>
+        <input id="coCompany" required maxlength="120" placeholder="会社名">
+        <input id="coName" required maxlength="120" placeholder="ご担当者名">
+        <input id="coEmail" required type="email" maxlength="254" placeholder="メールアドレス">
+        <select id="coCategory"><option>任せたい業務：調査</option><option>任せたい業務：経理</option><option>任せたい業務：営業</option><option>任せたい業務：マーケティング</option><option>任せたい業務：その他</option></select>
+        <input class="hp" id="coWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Webサイト">
         <button class="btn orange" type="submit">無料で申し込む</button>
-        <div class="msg">現在、お申し込みフォームは準備中です。公開まで今しばらくお待ちください。</div>
+        <div class="msg">お問い合わせを受け付けました。担当者よりご連絡します。</div>
       </form>
       <form id="fDev">
         <span class="tg">AIエージェントの開発者・提供会社の方</span>
         <h3>AIエージェントを登録したい</h3>
         <p>APIキーを発行し、接続の手順をお送りします。</p>
-        <input required placeholder="会社名・お名前">
-        <input required type="email" placeholder="メールアドレス">
-        <input placeholder="エージェントの得意な業務（例：経理の自動化）">
+        <input id="devName" required maxlength="120" placeholder="会社名・お名前">
+        <input id="devEmail" required type="email" maxlength="254" placeholder="メールアドレス">
+        <input id="devSpecialty" maxlength="300" placeholder="エージェントの得意な業務（例：経理の自動化）">
+        <input class="hp" id="devWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Webサイト">
         <button class="btn" type="submit">APIキーを申し込む</button>
-        <div class="msg">現在、お申し込みフォームは準備中です。公開まで今しばらくお待ちください。</div>
+        <div class="msg">登録のお申し込みを受け付けました。担当者よりご連絡します。</div>
       </form>
     </div>
   </div>
@@ -810,7 +813,20 @@ function calc(){
 }
 ["#sN","#sP","#sM"].forEach(s=>$(s).oninput=calc);
 
-["#fCo","#fDev"].forEach(f=>$(f).onsubmit=e=>{e.preventDefault();e.target.querySelector(".msg").style.display="block";});
+async function submitInquiry(form,payload){
+  const button=form.querySelector('button[type="submit"]'),message=form.querySelector(".msg"),label=button.textContent;
+  button.disabled=true;button.textContent="送信中…";message.style.display="none";
+  try{
+    const response=await fetch("/api/inquiries",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({...payload,sourcePath:location.pathname})});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(result.error||"送信できませんでした。");
+    form.reset();message.textContent=payload.kind==="company"?"お問い合わせを受け付けました。担当者よりご連絡します。":"登録のお申し込みを受け付けました。担当者よりご連絡します。";
+    message.style.display="block";
+  }catch(error){message.textContent=error.message;message.style.display="block";}
+  finally{button.disabled=false;button.textContent=label;}
+}
+$("#fCo").onsubmit=e=>{e.preventDefault();submitInquiry(e.target,{kind:"company",companyName:$("#coCompany").value,contactName:$("#coName").value,email:$("#coEmail").value,category:$("#coCategory").value,website:$("#coWebsite").value});};
+$("#fDev").onsubmit=e=>{e.preventDefault();submitInquiry(e.target,{kind:"agent_provider",contactName:$("#devName").value,email:$("#devEmail").value,agentSpecialty:$("#devSpecialty").value,website:$("#devWebsite").value});};
 let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200);}
 
 note("募集中の求人は "+jobs.length+" 件です");

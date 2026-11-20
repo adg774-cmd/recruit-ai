@@ -26,5 +26,6 @@ fs.rmSync(outputDirectory, { recursive: true, force: true });
 fs.mkdirSync(outputDirectory, { recursive: true });
 fs.writeFileSync(output, html);
 fs.copyFileSync(path.join(__dirname, 'admin.html'), path.join(outputDirectory, 'access-analytics.html'));
+fs.copyFileSync(path.join(__dirname, 'inquiries.html'), path.join(outputDirectory, 'inquiries.html'));
 fs.copyFileSync(path.join(__dirname, 'tracker.js'), path.join(outputDirectory, 'tracker.js'));
 console.log(`Analytics script configured at ${scriptSrc}`);
