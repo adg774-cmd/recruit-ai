@@ -6,7 +6,7 @@
   ],
   "functions": {
     "api/site.mjs": {
-      "includeFiles": "dist/index.html"
+      "includeFiles": "dist/home.html"
     }
   }
 }

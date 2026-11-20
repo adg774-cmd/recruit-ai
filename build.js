@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const source = path.join(__dirname, 'index.html');
 const outputDirectory = path.join(__dirname, 'dist');
-const output = path.join(outputDirectory, 'index.html');
+const output = path.join(outputDirectory, 'home.html');
 const rawConfig = process.env.VERCEL_OBSERVABILITY_CLIENT_CONFIG;
 
 if (!rawConfig) {
@@ -22,6 +22,7 @@ const html = fs.readFileSync(source, 'utf8').replace(
   scriptSrc,
 );
 
+fs.rmSync(outputDirectory, { recursive: true, force: true });
 fs.mkdirSync(outputDirectory, { recursive: true });
 fs.writeFileSync(output, html);
 fs.copyFileSync(path.join(__dirname, 'admin.html'), path.join(outputDirectory, 'access-analytics.html'));

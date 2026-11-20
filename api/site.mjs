@@ -48,7 +48,7 @@ export default {
       console.error('Access log write failed', error);
     }
 
-    const html = await readFile(path.join(process.cwd(), 'dist', 'index.html'), 'utf8');
+    const html = await readFile(path.join(process.cwd(), 'dist', 'home.html'), 'utf8');
     return new Response(html, {
       headers: {
         'content-type': 'text/html; charset=utf-8',
