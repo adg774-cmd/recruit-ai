@@ -24,4 +24,6 @@ const html = fs.readFileSync(source, 'utf8').replace(
 
 fs.mkdirSync(outputDirectory, { recursive: true });
 fs.writeFileSync(output, html);
+fs.copyFileSync(path.join(__dirname, 'admin.html'), path.join(outputDirectory, 'access-analytics.html'));
+fs.copyFileSync(path.join(__dirname, 'tracker.js'), path.join(outputDirectory, 'tracker.js'));
 console.log(`Analytics script configured at ${scriptSrc}`);

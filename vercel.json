@@ -1,4 +1,12 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/", "destination": "/api/site" }
+  ],
+  "functions": {
+    "api/site.mjs": {
+      "includeFiles": "dist/index.html"
+    }
+  }
 }
